@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "AI Resume Screener",
+  "version": "1.0",
+  "description": "AI-powered resume analyzer for recruiters",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["http://localhost:8080/*"],  
+  "action": {
+      "default_popup": "popup.html",
+      "default_icon": "icons/icon.jpg"
+  },
+  "background": {
+      "service_worker": "background.js"
+  },
+  "content_scripts": [
+      {
+          "matches": ["https://www.linkedin.com/*", "https://www.naukri.com/*"],
+          "js": ["content.js"]
+      }
+  ]
+}
