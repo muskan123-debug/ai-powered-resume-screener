@@ -1,12 +1,19 @@
 document.getElementById("analyzeResume").addEventListener("click", async () => {
     const fileInput = document.getElementById("resumeInput");
+    const jobDescription = document.getElementById("jobDescription").value.trim();
+
     if (fileInput.files.length === 0) {
         alert("Please upload a resume.");
+        return;
+    }
+    if (jobDescription === "") {
+        alert("Please enter a job description.");
         return;
     }
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
+    formData.append("jobDescription", jobDescription);
 
     try {
         const response = await fetch("http://localhost:8080/api/analyze", {

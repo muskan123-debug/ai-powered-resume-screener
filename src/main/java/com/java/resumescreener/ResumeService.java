@@ -23,29 +23,36 @@ public class ResumeService {
     @Value("${openai.api.key}")
     private String apiKey;
 
-    private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+    @Value("${openai.api.url}")
+    private String OPENAI_URL;
     
     public String extractText(MultipartFile file) throws Exception {
         Tika tika = new Tika();
         return tika.parseToString(file.getInputStream());
     }
 
-    public ResumeAnalysisResult analyzeResume(String resumeText) throws Exception {
+    public ResumeAnalysisResult analyzeResume(String resumeText,String jobDescription) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        // Construct the OpenAI API request body
-        JSONObject requestBody = new JSONObject();
-        requestBody.put("model", "gpt-4");
-        requestBody.put("max_tokens", 60);
+        // Construct the conversation messages
+    JSONArray messages = new JSONArray();
+    messages.put(new JSONObject().put("role", "system").put("content", 
+        "You are an AI trained to analyze resumes and provide a match score (1-100%) with feedback."));
+    messages.put(new JSONObject().put("role", "user").put("content", 
+        "Compare the following resume against this job description:\n\n" +
+        "Job Description:\n" + jobDescription + "\n\n" +
+        "Resume:\n" + resumeText + 
+        "\n\nProvide a match score (1-100%) and key feedback."));
 
-        JSONArray messages = new JSONArray();
-        messages.put(new JSONObject().put("role", "system").put("content", "You are an AI trained to analyze resumes and provide a match score (1-100%) with improvement suggestions."));
-        messages.put(new JSONObject().put("role", "user").put("content", "Analyze the following resume and provide feedback:\n\n" + resumeText));
-
-        requestBody.put("messages", messages);
+    // Construct the OpenAI API request body
+    JSONObject requestBody = new JSONObject();
+    requestBody.put("model", "gpt-4");
+    requestBody.put("max_tokens", 300);
+    requestBody.put("temperature", 0.3);
+    requestBody.put("messages", messages);  // Corrected to use "messages"
 
         //Send request to OpenAI
         HttpEntity<String> entity = new HttpEntity<>(requestBody.toString(), headers);

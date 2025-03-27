@@ -36,13 +36,14 @@ public class ResumeController {
 
     @PostMapping(value = "/analyze", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Async("taskExecutor") 
-    public CompletableFuture<ResponseEntity<?>> analyzeResume(@RequestParam("file") MultipartFile file) {  
+    public CompletableFuture<ResponseEntity<?>> analyzeResume(@RequestParam("file") MultipartFile file,
+    @RequestParam("jobDescription") String jobDescription) {  
     System.out.println("Received file: " + file.getOriginalFilename());  // Debugging log  
 
     return CompletableFuture.supplyAsync(() -> {
         try {
             String extractedText = resumeService.extractText(file);
-            ResumeAnalysisResult result = resumeService.analyzeResume(extractedText);
+            ResumeAnalysisResult result = resumeService.analyzeResume(extractedText, jobDescription);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error processing resume: " + e.getMessage());
