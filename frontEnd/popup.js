@@ -1,6 +1,8 @@
 document.getElementById("analyzeResume").addEventListener("click", async () => {
     const fileInput = document.getElementById("resumeInput");
     const jobDescription = document.getElementById("jobDescription").value.trim();
+    const resultDiv = document.getElementById("result");
+    const loadingDiv = document.getElementById("loading");
 
     if (fileInput.files.length === 0) {
         alert("Please upload a resume.");
@@ -14,6 +16,10 @@ document.getElementById("analyzeResume").addEventListener("click", async () => {
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
     formData.append("jobDescription", jobDescription);
+
+    // Show loading animation and clear previous results
+    loadingDiv.style.display = "block";
+    resultDiv.innerText = "";
 
     try {
         const response = await fetch("http://localhost:8080/api/analyze", {
@@ -30,9 +36,13 @@ document.getElementById("analyzeResume").addEventListener("click", async () => {
         }
 
         const result = await response.json();
-        document.getElementById("result").innerText = `Match Score: ${result.matchScore}%\n${result.feedback}`;
+        resultDiv.innerHTML = `<p>Match Score: <strong>${result.matchScore}%</strong></p>
+                               <p>${result.feedback}</p>`;
     } catch (error) {
         console.error("Error:", error);
         alert("Failed to analyze resume.");
+    } finally {
+        // Hide loading animation
+        loadingDiv.style.display = "none";
     }
 });

@@ -93,7 +93,7 @@ public class ResumeService {
             // Create JSON request body
             JSONObject requestBody = new JSONObject();
             requestBody.put("model", "gpt-4");
-            requestBody.put("max_tokens", 100);
+            requestBody.put("max_tokens", 75);
 
             JSONArray messages = new JSONArray();
             messages.put(new JSONObject().put("role", "system").put("content", "You are a helpful assistant."));
